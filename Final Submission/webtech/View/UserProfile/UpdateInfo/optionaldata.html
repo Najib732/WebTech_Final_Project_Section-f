@@ -42,20 +42,20 @@
     </form>
 
     <script>
-        // Validation function
+        
         function validateForm() {
             let livein = document.getElementById('livein').value;
             let university = document.getElementById('university').value;
             let college = document.getElementById('college').value;
             let hometown = document.getElementById('hometown').value;
 
-            // Check if any field is empty
+           
             if (!livein || !university || !college || !hometown) {
                 alert('All fields are required!');
-                return false; // Prevent form submission if validation fails
+                return false;
             }
 
-            // Proceed to send data via AJAX if validation passes
+            
             let data = {
                 livein: livein,
                 university: university,
@@ -68,13 +68,13 @@
             let xhttp = new XMLHttpRequest();
             xhttp.open('POST', '../../../Controller/UserProfile/UpdateInfo/userdata.php', true);
             xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-            xhttp.send('mydata=' + Cdata); // Send the data to the server
+            xhttp.send('mydata=' + Cdata); 
 
             xhttp.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
                     let response = JSON.parse(this.responseText);
 
-                    // Handle the response from the server
+                 
                     if (response.action == 'successfull') {
                         window.location.href = "../userprofile.php?id=" + response.id;
                     } else if (response.action == 'error') {
@@ -83,7 +83,7 @@
                 }
             };
 
-            return false; // Prevent form submission to allow AJAX request
+            return false; 
         }
     </script>
 

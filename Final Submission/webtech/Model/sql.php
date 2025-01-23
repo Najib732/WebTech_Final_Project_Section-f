@@ -1,7 +1,7 @@
 <?php
 
 
-require_once('Database/connection.php'); 
+require_once('Database/connection.php');
 session_start();
 
 
@@ -31,7 +31,7 @@ function getPosts()
     $con = getConnection();
     $id = $_SESSION['userid'];
 
-     $sql = "SELECT friendid FROM friendlist WHERE userid = $id";
+    $sql = "SELECT friendid FROM friendlist WHERE userid = $id";
 
     $result = mysqli_query($con, $sql);
 
@@ -246,7 +246,7 @@ function postComment($postid, $comment)
 function comment($post_id)
 {
     $con = getConnection();
-    $Post_id = $post_id; 
+    $Post_id = $post_id;
     $sql = "SELECT comment, comment_id FROM postComments WHERE post_id = $Post_id";
 
     $result = mysqli_query($con, $sql);
@@ -323,28 +323,62 @@ function postdelete($postid)
 {
 
     $con = getConnection();
-  
-//     $sql = " DELETE FROM postComments WHERE post_id=$postid";
-//    $a= mysqli_query($con, $sql);
- 
-//     $sql = " DELETE FROM postLikes WHERE post_id=$postid";
-//    $b= mysqli_query($con, $sql);
 
-    $sql = " DELETE FROM posts WHERE post_id=$postid";
-    $result = mysqli_query($con, $sql);
-  
-    if ($result) {
-        return true;
-    } else {
-        return false;
+        $sql = " DELETE FROM postComments WHERE post_id=$postid";
+       $a= mysqli_query($con, $sql);
+
+        $sql = " DELETE FROM postLikes WHERE post_id=$postid";
+       $b= mysqli_query($con, $sql);
+
+
+
+    $result = getpost($postid);
+    $one = $result[0];
+    $two = $result[1];
+    $three = $result[2];
+    $four = $result[3];
+    $five = $result[4];
+   // var_dump($one, $two, $three, $four, $five);
+    
+    $sql = "INSERT INTO deletedpost (post_id, user_id, postContent, postType, Type) 
+        VALUES ('$one', '$two', '$three', '$four', '$five')";
+      //  var_dump($sql);
+      
+
+    $queryResult = mysqli_query($con, $sql);
+    if ($queryResult) {
+        $sql = " DELETE FROM posts WHERE post_id=$postid";
+        $result = mysqli_query($con, $sql);
+        
+        if ($result) {
+            return true;
+        } else {
+            return false;
+        }
+    
     }
 
+
+    
     mysqli_close($con);
 }
 
 
-function deleteComment($commentId) {
-     // Check if the session user ID is being used properly
+function getpost($id)
+{
+    $con = getConnection();
+    $sql = "SELECT * from posts WHERE post_id=$id";
+    $result = mysqli_query($con, $sql);
+
+    $row = mysqli_fetch_row($result);
+
+    return $row;
+}
+
+
+function deleteComment($commentId)
+{
+    // Check if the session user ID is being used properly
     $con = getConnection();
     $sql = "DELETE FROM postComments WHERE comment_id = $commentId";
 
@@ -367,25 +401,25 @@ function report($postid, $data)
     $con = getConnection();
     $user_id = $_SESSION['userid'];
 
-    
 
-    $sql = "SELECT * FROM posts WHERE post_id='$postid'";
+    $stmt = $con->prepare("SELECT * FROM posts WHERE post_id = ?");
+    $stmt->bind_param("i", $postid); 
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $stmt->close(); 
 
-    $result = mysqli_query($con, $sql);
-    $row = mysqli_fetch_assoc($result);
-
-    if ($row) {
-        $post_id = $postid;
+    if ($row = $result->fetch_assoc()) {
+        $post_id = $row['post_id'];
         $post_content = $row['postContent'];
         $post_type = $row['postType'];
 
-        $sql1 = "INSERT INTO report_post (post_id, user_id, post_content, post_type, details) 
-                VALUES ('$post_id', '$user_id', '$post_content', '$post_type', '$data')";
+        $stmt = $con->prepare("INSERT INTO report_post (post_id, user_id, post_content, post_type, details) 
+                VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("issi", $post_id, $user_id, $post_content, $post_type, $data);
+        $result = $stmt->execute();
+        $stmt->close();
 
-        $result1 = mysqli_query($con, $sql1);
-
-
-        if ($result1) {
+        if ($result) {
             mysqli_close($con);
             return true;
         } else {
@@ -394,7 +428,7 @@ function report($postid, $data)
         }
     } else {
         mysqli_close($con);
-        return false;
+        return false; 
     }
 }
 
@@ -404,21 +438,23 @@ function getNewsPosts()
     $con = getConnection();
     $id = $_SESSION['userid'];
 
-    $sql = "SELECT id FROM userdata WHERE id_status ='news'";
+    $sql = "SELECT id FROM userdata WHERE id_status ='political'";
 
     $result = mysqli_query($con, $sql);
 
 
-
     $newsid = [];
     while ($row = mysqli_fetch_assoc($result)) {
+
+       
+
         $newsid[] = $row['id'];
     }
 
     $posts = [];
 
     foreach ($newsid as $newsId) {
-        $sql = "SELECT * FROM posts WHERE user_id = $newsId";
+        $sql = "SELECT * FROM posts WHERE user_id = 635561";
         $result = mysqli_query($con, $sql);
         if (!$result) {
             die("Query failed: " . mysqli_error($con));
@@ -431,3 +467,36 @@ function getNewsPosts()
     return $posts;
     mysqli_close($con);
 }
+
+
+function getAllUser()
+{
+    $con = getConnection();
+    $sql = "SELECT * FROM userdata";
+    $result = mysqli_query($con, $sql);
+    $rows = [];
+
+    while ($row = mysqli_fetch_row($result)) {
+        $rows[] = $row; // Append each row to the $rows array
+    }
+
+    return $rows;
+}
+
+function deletefriend($friendId) {
+    $con = getConnection(); // Assuming you have a function 'getConnection()' to establish the database connection
+  
+    // Use parameterized query to prevent SQL injection
+    $stmt = $con->prepare("DELETE FROM friendlist WHERE friendid = ?"); 
+    $stmt->bind_param("i", $friendId); // 'i' specifies that $friendId is an integer
+  
+    if ($stmt->execute()) {
+      $stmt->close();
+      $con->close();
+      return true;
+    } else {
+      $stmt->close();
+      $con->close();
+      return false;
+    }
+  }

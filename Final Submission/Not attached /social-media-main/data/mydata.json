@@ -1,0 +1,13 @@
+{
+  "name": "Leonel Messi",
+  "age": 25,
+  "current_location": "Dhaka, Bangladesh",
+  "hometown": "Chittagong",
+  "img": "./assets/images/1.jpeg",
+  "education": [
+    "Bangladesh Navy School and College, Chittagong",
+    "American International University-Bangladesh",
+    "Azim Hakim School and College",
+    "নাসিরাবাদ সরকারী উচ্চ বিদ্যালয়"
+  ]
+}

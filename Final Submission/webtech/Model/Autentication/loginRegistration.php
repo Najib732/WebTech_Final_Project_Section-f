@@ -3,7 +3,7 @@
 
 function getConnection()
 {
-    $con = mysqli_connect('127.0.0.1', 'root', '', 'webtech');
+    $con = mysqli_connect('127.0.0.1', 'root', '', 'connectnation');
     return $con;
 }
 
@@ -17,9 +17,22 @@ function login($email, $password)
         $row = mysqli_fetch_assoc($result);
         return $row['id'];
     } else {
-        return false;
+        
+            $con  = getConnection();
+            $sql = "select * from adminlist where username='{$email}' and password='{$password}'";
+
+            $result = mysqli_query($con, $sql);
+            $count =  mysqli_num_rows($result);
+              
+            if($count == 1){
+                header('location: ../../Admin/connect/View/AdminHomepage.php');
+
+            }else{
+                return false;
+            }
+        }
+        
     }
-}
 
 
 function autogenerateId()

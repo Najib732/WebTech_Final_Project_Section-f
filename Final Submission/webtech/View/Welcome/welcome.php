@@ -9,8 +9,8 @@ if (empty($_SESSION['userid'])) {
     require_once('../../Model/sql.php');
     $id = $_SESSION['userid'];
 
+  ?>
 ?>
-    ?>
 
 
 
@@ -207,7 +207,7 @@ if (empty($_SESSION['userid'])) {
     </head>
 
     <body>
-
+      
 
         <nav id="navbar">
             <ul class="nav-list">
@@ -237,17 +237,47 @@ if (empty($_SESSION['userid'])) {
                     </tr>
 
                     <tr>
-                        <td><a href="../Newspaper/Political/political.php?id=<?php echo $id; ?>">political</a></td>
+                    <td><a href="../Newspaper/Political/political.php?id=<?php echo $id; ?>">political</a></td>
                     </tr>
 
                 </table>
             </div>
             <div id="green-column">
-                <table border="3" id="posts-table">
-                    
+                <table border="3">
+                    <?php
+                    $allPosts = getPosts();
+    
+                    $_SESSION['page']="Welcome";
+                    foreach ($allPosts as $post) {
+                    ?>
+
+                        <tr>
+                            <td colspan="4">
+                                <?php
+
+                                if ($post['postType'] == 'image') {
+
+                                    echo '<img src="../../' . $post['postContent'] . '" alt="Post Image" class="post-image">';
+                                } else {
+
+                                    echo '<p>' . htmlspecialchars($post['postContent'], ENT_QUOTES, 'UTF-8') . '</p>';
+                                }
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p style="color: #f1f1f1;">Likes: <?php echo  countLikes($post['post_id']); ?></p>
+                                <a href="../../Controller/Post/Like&del.php?post_id=<?php echo $post['post_id']; ?>&action=like" class="button">Like</a>
+                            </td>
+                            <td><a href="../Post/comment.php?post_id=<?php echo $post['post_id']; ?>" class="button">Comment</a></td>
+                            <td>
+                            <a href="../Post/report.php?post_id=<?php  echo $post['post_id']; ?>" class="button">Report</a>                            </td>
+
+                        </tr>
+
+                    <?php } ?>
                 </table>
-
-
 
 
             </div>
@@ -273,11 +303,6 @@ if (empty($_SESSION['userid'])) {
         </div>
 
     </body>
-
-    
-
-    <script src="js/script.js"></script>
-
 
     </html>
 

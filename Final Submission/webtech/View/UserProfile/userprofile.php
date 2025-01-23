@@ -15,7 +15,7 @@ if (empty($_SESSION['userid'])) {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Div Structure with Colors</title>
-        <!-- <link rel="stylesheet" type="text/css" href="styles.css"> -->
+        <link rel="stylesheet" type="text/css" href="styles.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
         <style>
             body {
@@ -123,8 +123,13 @@ if (empty($_SESSION['userid'])) {
 
             .cover-img {
                 width: 100%;
-                height: 20vh;
-                object-fit: cover;
+                height: auto;
+                /* Allow height to adjust based on image aspect ratio */
+                max-height: 300px;
+                /* Set a maximum height to prevent excessively tall images */
+                object-fit: contain;
+                /* Scale the image to fit within the container without cropping */
+                object-position: center center;
             }
 
             .top-row2 {
@@ -294,7 +299,7 @@ if (empty($_SESSION['userid'])) {
                 <li><button class="notif-btn" title="Notifications">
                         <i class="fas fa-bell"></i>
                     </button></li>
-                <li><button class="msg-btn" title="logout" onclick="window.location.href='logout.php?'">
+                <li><button class="msg-btn" title="logout" onclick="window.location.href='../Authentication/logout.php?'">
                         <i class="fas fa-sign-out-alt"></i>
                     </button></li>
                 <li>
@@ -310,14 +315,17 @@ if (empty($_SESSION['userid'])) {
         ?>
 
         <div id="main-container">
-            <div id="red-column"></div>
+            <div id="red-column">
+                </h1>
+            </div>
+
             <div id="green-column">
-                <!-- Top row with cover and profile image -->
+
                 <div class="top-row1">
                     <img src="../../<?php echo $result['profilepic']; ?>" class="cover-img" alt="Cover Image">
 
-                    <!-- <img src="new.jpg" class="cover-img" alt="Cover Image"> -->
                 </div>
+
                 <div class="top-row2">
                     <img src="../../<?php echo $result['profilepic']; ?>" class="profileimg" alt="Profile Image">
                     <p class="username"><?php echo $result['name'] ?> </p><br>
@@ -327,15 +335,16 @@ if (empty($_SESSION['userid'])) {
                 </div>
 
                 <div class="bottom-columns">
-                    <!-- Left side column -->
                     <div class="left_column-item">
-                        <h1 style="color: white;">User Optional Data</h1>
+
+                        <h1 style="color: white;"> User Optional Data </h1>
 
                         <table border="1">
+
                             <?php $allUsers = userdata($id);
                             ?>
                             <tr>
-                                <<td>Current Address:<?php echo $allUsers['livein'] ?></td>
+                                <td>Current Address:<?php echo $allUsers['livein'] ?></td>
                             </tr>
                             <tr>
                                 <td>university:<?php echo $allUsers['university'] ?></td>
@@ -348,12 +357,113 @@ if (empty($_SESSION['userid'])) {
                             </tr>
 
                         </table>
+
+                        <select id="linkSelect" onchange="navigateLink()">
+                            <option value="">-- Select an option --</option>
+                            <option value="http://localhost/webtech/View/UserProfile/Help/help.php">Help</option>
+                            <option value="http://localhost/webtech/View/UserProfile/Help/terms.php">Terms</option>
+                            <option value="http://localhost/webtech/View/UserProfile/Help/contact.php">contact</option>
+                        </select>
+
+                        <a href="Friend/friend.php?id=<?php echo $id ?>" class="btn">Friendlist</a>
+
+                        <style>
+                            .btn {
+                                display: inline-block;
+                                padding: 10px 20px;
+                                background-color: blue;
+                                color: white;
+                                text-align: center;
+                                border-radius: 5px;
+                                text-decoration: none;
+                                font-weight: bold;
+                            }
+
+                            .btn:hover {
+                                background-color: darkblue;
+                            }
+                        </style>
+
+                        <script>
+                            function navigateLink() {
+                                const select = document.getElementById("linkSelect");
+                                const selectedValue = select.value;
+                                if (selectedValue) {
+                                    window.location.href = selectedValue;
+                                }
+                            }
+                        </script>
+
+                        <p>Uploaded Picture</p>
+                        <table border="1" id="leftable">
+                            <?php
+                            $allUsers = getPersonalPost($id);
+                            $count = 0;
+                            foreach ($allUsers as $post) {
+                                if ($post['postType'] == 'image') {
+
+                                    $imagePath = $post['postContent'];
+                                    if ($count % 3 == 0) {
+                                        echo '<tr>';
+                                    }
+                            ?>
+                                    <td>
+                                        <img src="../../<?php echo htmlspecialchars($imagePath, ENT_QUOTES, 'UTF-8'); ?>" alt="Post Image" style="width: 100px; height: 100px;">
+                                    </td>
+                            <?php
+                                    if ($count % 3 == 1) {
+                                        echo '</tr>';
+                                    }
+                                    $count++;
+                                    if ($count == 9) {
+                                        break;
+                                    }
+                                }
+                            }
+                            if ($count % 3 != 0) {
+                                echo '</tr>';
+                            }
+                            ?>
+                        </table>
+
+
+
                     </div>
 
-                    <!-- Right side column -->
                     <div class="right_column-item">
-                        <table border="3" id="posts-table">
-                         
+                        <table border="3">
+                            <?php
+                            $_SESSION['page'] = "UserProfile";
+                            $allPosts = getPersonalPost($id);
+                            foreach ($allPosts as $post) {
+                            ?>
+
+                                <tr>
+                                    <td colspan="4">
+                                        <?php
+
+                                        if ($post['postType'] == 'image') {
+
+                                            echo '<img src="../../' . $post['postContent'] . '" alt="Post Image" class="post-image">';
+                                        } else {
+
+                                            echo '<p>' . htmlspecialchars($post['postContent'], ENT_QUOTES, 'UTF-8') . '</p>';
+                                        }
+                                        ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p>Likes: <?php echo  countLikes($post['post_id']); ?></p>
+                                        <a href="../../Controller/Post/Like&del.php?post_id=<?php echo $post['post_id']; ?>&action=like" class="button">Like</a>
+
+                                    </td>
+                                    <td><a href="../Post/comment.php?post_id=<?php echo $post['post_id']; ?>" class="button">Comment</a></td>
+                                    <td><a href="../../Controller/Post/Like&del.php?post_id=<?php echo $post['post_id']; ?>&action=postdelete" class="button">delete</a></td>
+
+                                </tr>
+
+                            <?php } ?>
                         </table>
                     </div>
 
@@ -365,7 +475,6 @@ if (empty($_SESSION['userid'])) {
         </div>
 
     </body>
-    <script src="js/post/script.js"></script>
-   
+
     </html>
 <?php } ?>

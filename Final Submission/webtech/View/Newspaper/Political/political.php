@@ -212,7 +212,7 @@ if (empty($_SESSION['userid'])) {
         <nav id="navbar">
             <ul class="nav-list">
                 <li><input type="text" placeholder="Search..."></li>
-                <li><a href="welcome.php">Home</a></li>
+                <li><a href="../../Welcome/welcome.php">Home</a></li>
                 <li><button class="notif-btn" title="Notifications">
                         <i class="fas fa-bell"></i>
                     </button></li>
@@ -222,7 +222,7 @@ if (empty($_SESSION['userid'])) {
 
 
                 <li>
-                    <button class="img-btn" title="User" onclick="window.location.href='../UserProfile/userprofile.php?id=<?php echo $id; ?>'">
+                    <button class="img-btn" title="User" onclick="window.location.href='../../UserProfile/userprofile.php?id=<?php echo $id; ?>'">
                         <i class="fas fa-user"></i>
                     </button>
                 </li>
@@ -266,15 +266,13 @@ if (empty($_SESSION['userid'])) {
                             </td>
                         </tr>
                         <tr>
-                            <td>
+                        <td>
                                 <p style="color: #f1f1f1;">Likes: <?php echo  countLikes($post['post_id']); ?></p>
-                                <a href="../../../Controller/Post/PostCheck.php?post_id=<?php echo $post['post_id']; ?>&action=like" class="button">Like</a>
+                                <a href="../../../Controller/Post/Like&del.php?post_id=<?php echo $post['post_id']; ?>&action=like" class="button">Like</a>
                             </td>
-                            <!-- <td><a href="../../../Controller/Post/PostCheck.php?post_id=<?php echo $post['post_id']; ?>" class="button">Comment</a></td> -->
                             <td><a href="../../Post/comment.php?post_id=<?php echo $post['post_id']; ?>" class="button">Comment</a></td>
-
                             <td>
-                                <a href="../../Post/report.php?post_id=<?php echo $post['post_id']; ?>" class="button">Report</a>
+                                <a href="../../Post/report.php?post_id=<?php  echo $post['post_id']; ?>" class="button">Report</a>
                             </td>
 
                         </tr>
