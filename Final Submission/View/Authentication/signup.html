@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-container h1 {
+            font-size: 24px;
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .form-group input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <form id="signupForm" onsubmit="return validateForm()">
+            <h1>connect_nation</h1>
+
+            <div class="form-group">
+                <label for="username">Name:</label>
+                <input type="text" id="username" name="username" placeholder="Enter your full name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="date">Date of Birth:</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+
+            <button type="submit" class="submit-btn" name="submit">Submit</button>
+            <div id="error-message" class="error"></div>
+        </form>
+    </div>
+
+    <script>
+        function validateForm() {
+            let username = document.getElementById('username').value;
+            let password = document.getElementById('password').value;
+            let email = document.getElementById('email').value;
+            let date = document.getElementById('date').value;
+    
+           
+            document.getElementById('error-message').textContent = "";
+    
+            
+            if (!username || !password || !email || !date) {
+                document.getElementById('error-message').textContent = "All fields are required!";
+                return false; 
+            }
+    
+           
+            let isValidUsername = true;
+            
+            for (let i = 0; i < username.length; i++) {
+                let char = username.charAt(i);
+                if (!((char >= 'A' && char <= 'Z') || (char >= 'a' && char <= 'z'))) {
+                    isValidUsername = false;
+                    break;
+                }
+            }
+    
+            if (!isValidUsername) {
+                return false;
+            }
+    
+            let isValidPassword = false;
+            let hasSpecialChar = false;
+            let specialChars = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+'];
+            
+            if (password.length >= 6) {
+                for (let i = 0; i < password.length; i++) {
+                    let char = password.charAt(i);
+                    if (specialChars.includes(char)) {
+                        hasSpecialChar = true;
+                        break;
+                    }
+                }
+    
+                if (hasSpecialChar) {
+                    isValidPassword = true;
+                }
+            }
+    
+            if (!isValidPassword) {
+                document.getElementById('error-message').textContent = "Password must be at least 6 characters long and contain one special character (!@#$%^&*()_+).";
+                return false;
+            }
+    
+          
+            let formData = {
+                username: username,
+                password: password,
+                email: email,
+                date: date
+            };
+    
+            let jsonData = JSON.stringify(formData);
+    
+            let xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "../../Controller/Authentication/SignupCheck.php", true);
+            xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhttp.send("mydata=" + encodeURIComponent(jsonData));
+    
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    let response = JSON.parse(this.responseText);
+    
+                    if (response.action === "successfull") {
+                        window.location.href = "../../View/Authentication/login.html";
+                    } else if (response.action === "error") {
+                        document.getElementById('error-message').textContent = response.message;
+                    }
+                }
+            };
+    
+            return false; 
+        }
+    </script>
+    
+</body>
+
+</html>
