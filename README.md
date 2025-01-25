@@ -1,9 +1,6 @@
 
 <html >
-<head>
 
-  <title>Webtech File Contribution</title>
-</head>
 <body>
   <table border="1">
     <tr>
@@ -16,6 +13,7 @@
     </tr>
   </table>
 
+  <br>
   <br>
 
   <table border="1">
